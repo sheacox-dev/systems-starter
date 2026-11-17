@@ -1,0 +1,402 @@
+<title>Week Ledger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a planner page. Week summary strip on top, add form beside a day-by-day agenda; stacks to one column on phones. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #18202e;
+  --muted: #5d6779;
+  --line: #dfe3ea;
+  --accent: #2b4acb;
+  --assign: #5b4ad6;  --assign-soft: #ecebfc;
+  --workout: #13875a; --workout-soft: #e2f4ec;
+  --shift: #b8650a;   --shift-soft: #fbeedd;
+  --danger: #c4323a;  --danger-soft: #fbe6e7;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151d; --surface: #1a202b; --ink: #e8ecf3; --muted: #97a1b3; --line: #2b3342; --accent: #8ea2ff;
+  --assign: #a99dff; --assign-soft: #2a2648; --workout: #4fd19a; --workout-soft: #173629;
+  --shift: #f2a64d; --shift-soft: #3a2a15; --danger: #ff7d84; --danger-soft: #3d1d21; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11151d; --surface: #1a202b; --ink: #e8ecf3; --muted: #97a1b3; --line: #2b3342; --accent: #8ea2ff;
+  --assign: #a99dff; --assign-soft: #2a2648; --workout: #4fd19a; --workout-soft: #173629;
+  --shift: #f2a64d; --shift-soft: #3a2a15; --danger: #ff7d84; --danger-soft: #3d1d21; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 24px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+h1 { font: 700 clamp(28px, 5vw, 40px)/1.05 var(--f-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.weeknav { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; width: 34px; height: 34px; display: grid; place-items: center; }
+.textbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-family: var(--f-body); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Summary strip */
+.summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; }
+.stat .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.stat .num { font: 700 30px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.stat .num small { font: 500 14px var(--f-body); color: var(--muted); margin-left: 4px; }
+.stat .sub { font-size: 13px; color: var(--muted); }
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 3px; }
+
+.main { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .main { grid-template-columns: minmax(0, 1fr); } .summary { grid-template-columns: minmax(0, 1fr); } }
+
+/* Add form */
+form.add { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+@media (max-width: 820px) { form.add { position: static; } }
+form.add h2 { font: 600 18px var(--f-display); margin: 0; }
+.kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--bg); padding: 4px; border-radius: 10px; }
+.kinds label { text-align: center; padding: 7px 4px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); }
+.kinds input { position: absolute; opacity: 0; pointer-events: none; }
+.kinds input:checked + span { color: var(--ink); }
+.kinds label:has(input:checked) { background: var(--surface); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.kinds label:has(input:focus-visible) { outline: 2px solid var(--accent); }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+input[type=text], input[type=date], input[type=time], input[type=number], select {
+  width: 100%; min-width: 0; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.primary { background: var(--accent); color: var(--surface); border: 0; border-radius: 9px; padding: 10px; font-weight: 600; }
+.formmsg { font-size: 13px; color: var(--danger); min-height: 1em; margin: 0; }
+
+/* Agenda */
+.agenda { display: grid; gap: 18px; min-width: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.status { font-size: 13px; color: var(--muted); margin-left: auto; }
+.day { display: grid; gap: 8px; }
+.dayhead { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.dayhead b { font: 600 16px var(--f-display); }
+.dayhead span { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.dayhead .today { color: var(--accent); font-weight: 500; }
+.dayhead .tot { margin-left: auto; }
+.items { display: grid; gap: 6px; }
+.item { display: grid; grid-template-columns: 4px auto minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px 10px 0; overflow: hidden; }
+.item .stripe { align-self: stretch; margin: -10px 0; }
+.check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--line); background: transparent; display: grid; place-items: center; padding: 0; }
+.check svg { opacity: 0; }
+.item.done .check svg { opacity: 1; }
+.item.done .title { text-decoration: line-through; color: var(--muted); }
+.title { font-weight: 600; overflow-wrap: anywhere; }
+.meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.meta .mono { font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pill { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; }
+.pill.late { background: var(--danger-soft); color: var(--danger); }
+.acts { display: flex; gap: 4px; }
+.del { border: 0; background: transparent; color: var(--muted); border-radius: 6px; padding: 4px 8px; font-size: 13px; }
+.del:hover { color: var(--danger); background: var(--danger-soft); }
+.del.confirm { color: var(--danger); background: var(--danger-soft); font-weight: 600; }
+.empty { border: 1px dashed var(--line); border-radius: 12px; padding: 28px 20px; text-align: center; color: var(--muted); }
+.empty b { display: block; color: var(--ink); font: 600 17px var(--f-display); margin-bottom: 4px; }
+
+.k-assignment { --k: var(--assign); --ks: var(--assign-soft); }
+.k-workout { --k: var(--workout); --ks: var(--workout-soft); }
+.k-shift { --k: var(--shift); --ks: var(--shift-soft); }
+.stripe, .dot { background: var(--k); }
+.item.done .check { background: var(--k); border-color: var(--k); color: var(--surface); }
+.kindtag { color: var(--k); font-weight: 600; font-size: 12px; }
+@media (prefers-reduced-motion: no-preference) { .item { transition: opacity .2s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Week Ledger</h1>
+    <div class="weeknav">
+      <button class="iconbtn" id="prev" aria-label="Previous week">‹</button>
+      <span id="weeklabel">This week</span>
+      <button class="iconbtn" id="next" aria-label="Next week">›</button>
+      <button class="textbtn" id="thisweek">Today</button>
+    </div>
+  </header>
+
+  <section class="summary" aria-label="This week at a glance">
+    <div class="stat k-assignment">
+      <div class="label"><span class="dot"></span>Assignments</div>
+      <div class="num" id="s-assign">0<small>left</small></div>
+      <div class="bar"><i id="b-assign" style="width:0;background:var(--assign)"></i></div>
+      <div class="sub" id="s-assign-sub">Nothing due this week</div>
+    </div>
+    <div class="stat k-workout">
+      <div class="label"><span class="dot"></span>Workouts</div>
+      <div class="num" id="s-work">0<small>min</small></div>
+      <div class="bar"><i id="b-work" style="width:0;background:var(--workout)"></i></div>
+      <div class="sub" id="s-work-sub">Goal 150 min a week</div>
+    </div>
+    <div class="stat k-shift">
+      <div class="label"><span class="dot"></span>Shifts</div>
+      <div class="num" id="s-shift">0<small>hrs</small></div>
+      <div class="bar"><i id="b-shift" style="width:0;background:var(--shift)"></i></div>
+      <div class="sub" id="s-shift-sub">No shifts scheduled</div>
+    </div>
+  </section>
+
+  <div class="main">
+    <form class="add" id="addform" novalidate>
+      <h2>Add to the week</h2>
+      <div class="kinds" role="radiogroup" aria-label="Type">
+        <label><input type="radio" name="kind" id="kind-assignment" value="assignment" checked><span>Assignment</span></label>
+        <label><input type="radio" name="kind" id="kind-workout" value="workout"><span>Workout</span></label>
+        <label><input type="radio" name="kind" id="kind-shift" value="shift"><span>Shift</span></label>
+      </div>
+      <div class="field">
+        <label for="f-title" id="l-title">Assignment</label>
+        <input type="text" id="f-title" placeholder="Lab report 3" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-detail" id="l-detail">Class</label>
+        <input type="text" id="f-detail" placeholder="BIO 210" autocomplete="off">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="f-date" id="l-date">Due date</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field" id="w-minutes" hidden>
+          <label for="f-minutes">Minutes</label>
+          <input type="number" id="f-minutes" min="1" step="5" placeholder="45">
+        </div>
+        <div class="field" id="w-due">
+          <label for="f-duetime">Due time</label>
+          <input type="time" id="f-duetime" value="23:59">
+        </div>
+      </div>
+      <div class="row2" id="w-times" hidden>
+        <div class="field">
+          <label for="f-start">Start</label>
+          <input type="time" id="f-start" value="09:00">
+        </div>
+        <div class="field">
+          <label for="f-end">End</label>
+          <input type="time" id="f-end" value="17:00">
+        </div>
+      </div>
+      <button class="primary" type="submit" id="addbtn">Add assignment</button>
+      <p class="formmsg" id="formmsg" role="status"></p>
+    </form>
+
+    <section class="agenda" aria-label="Agenda">
+      <div class="filters" id="filters">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+        <button class="chip k-assignment" type="button" data-f="assignment" aria-pressed="false"><span class="dot"></span>Assignments</button>
+        <button class="chip k-workout" type="button" data-f="workout" aria-pressed="false"><span class="dot"></span>Workouts</button>
+        <button class="chip k-shift" type="button" data-f="shift" aria-pressed="false"><span class="dot"></span>Shifts</button>
+        <span class="status" id="status">Loading your week…</span>
+      </div>
+      <div id="days" class="agenda"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const WORKOUT_GOAL = 150;
+  const LABELS = {
+    assignment: { title: "Assignment", tph: "Lab report 3", detail: "Class", dph: "BIO 210", date: "Due date", btn: "Add assignment" },
+    workout:    { title: "Workout", tph: "Leg day", detail: "Type or place", dph: "Gym, run, yoga…", date: "Date", btn: "Add workout" },
+    shift:      { title: "Job", tph: "Front desk", detail: "Location or note", dph: "Downtown store", date: "Date", btn: "Add shift" },
+  };
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  let entries = [];       // [{id, ...data}]
+  let col = null;         // db collection, or null when saving is unavailable
+  let filter = "all";
+  let weekOffset = 0;
+  let pendingDelete = null;
+  const $ = (id) => document.getElementById(id);
+
+  // ---- dates (local, YYYY-MM-DD strings so sorting is lexical) ----
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const parse = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+  const todayIso = () => iso(new Date());
+  function weekStart(offset) {           // Monday-start week
+    const d = new Date(); d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + offset * 7);
+    return d;
+  }
+  const mins = (t) => { const [h,m] = (t||"0:0").split(":").map(Number); return h*60 + m; };
+  function shiftHours(e) { let d = mins(e.end) - mins(e.start); if (d <= 0) d += 1440; return d / 60; } // overnight shifts wrap
+  const fmtTime = (t) => { if (!t) return ""; let [h,m] = t.split(":").map(Number); const ap = h >= 12 ? "pm" : "am"; h = h % 12 || 12; return m ? `${h}:${String(m).padStart(2,"0")}${ap}` : `${h}${ap}`; };
+  const fmtHrs = (h) => (Math.round(h * 10) / 10).toString();
+
+  // ---- form ----
+  function currentKind() { return document.querySelector('input[name="kind"]:checked').value; }
+  function syncForm() {
+    const k = currentKind(), L = LABELS[k];
+    $("l-title").textContent = L.title; $("f-title").placeholder = L.tph;
+    $("l-detail").textContent = L.detail; $("f-detail").placeholder = L.dph;
+    $("l-date").textContent = L.date; $("addbtn").textContent = L.btn;
+    $("w-due").hidden = k !== "assignment";
+    $("w-minutes").hidden = k !== "workout";
+    $("w-times").hidden = k !== "shift";
+    $("formmsg").textContent = "";
+  }
+  document.querySelectorAll('input[name="kind"]').forEach(r => r.addEventListener("change", syncForm));
+  $("f-date").value = todayIso();
+
+  $("addform").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const kind = currentKind();
+    const title = $("f-title").value.trim();
+    const date = $("f-date").value;
+    if (!title) { $("formmsg").textContent = `Give the ${kind} a name.`; $("f-title").focus(); return; }
+    if (!date) { $("formmsg").textContent = "Pick a date."; $("f-date").focus(); return; }
+    const data = { kind, title, detail: $("f-detail").value.trim(), date, done: false, createdAt: Date.now() };
+    if (kind === "assignment") data.dueTime = $("f-duetime").value || "23:59";
+    if (kind === "workout") {
+      const m = parseInt($("f-minutes").value, 10);
+      if (!(m > 0)) { $("formmsg").textContent = "Enter how many minutes the workout lasts."; $("f-minutes").focus(); return; }
+      data.minutes = m;
+    }
+    if (kind === "shift") {
+      data.start = $("f-start").value; data.end = $("f-end").value;
+      if (!data.start || !data.end) { $("formmsg").textContent = "Enter a start and end time."; return; }
+    }
+    $("addbtn").disabled = true;
+    try {
+      if (col) await col.add(data);
+      else { entries.push({ id: "local-" + Date.now(), ...data }); render(); }
+      $("f-title").value = ""; $("f-detail").value = ""; $("f-minutes").value = "";
+      $("formmsg").textContent = "";
+      // jump to the week the new item lands in
+      const ws = weekStart(0), target = parse(date);
+      weekOffset = Math.floor((target - ws) / (7 * 864e5));
+      render();
+    } catch (e) {
+      $("formmsg").textContent = e && e.code === "quota_exceeded" ? "The tracker is full. Delete some old items, then try again." : "Couldn't save that. Check your connection and try again.";
+    } finally { $("addbtn").disabled = false; }
+  });
+
+  // ---- filters & week nav ----
+  $("filters").addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-f]"); if (!b) return;
+    filter = b.dataset.f;
+    document.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    render();
+  });
+  $("prev").onclick = () => { weekOffset--; render(); };
+  $("next").onclick = () => { weekOffset++; render(); };
+  $("thisweek").onclick = () => { weekOffset = 0; render(); };
+
+  // ---- item actions ----
+  $("days").addEventListener("click", async (ev) => {
+    const el = ev.target.closest(".item"); if (!el) return;
+    const e = entries.find(x => x.id === el.dataset.id); if (!e) return;
+    if (ev.target.closest(".check")) {
+      if (col) { try { await col.doc(e.id).update({ done: !e.done }); } catch { setStatus("Couldn't update. Try again."); } }
+      else { e.done = !e.done; render(); }
+    } else if (ev.target.closest(".del")) {
+      if (pendingDelete !== e.id) { pendingDelete = e.id; render(); setTimeout(() => { if (pendingDelete === e.id) { pendingDelete = null; render(); } }, 4000); return; }
+      pendingDelete = null;
+      if (col) { try { await col.doc(e.id).delete(); } catch { setStatus("Couldn't delete. Try again."); } }
+      else { entries = entries.filter(x => x.id !== e.id); render(); }
+    }
+  });
+
+  // ---- render ----
+  function setStatus(t) { $("status").textContent = t; }
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+  function render() {
+    const ws = weekStart(weekOffset), we = new Date(ws); we.setDate(we.getDate() + 6);
+    const wsI = iso(ws), weI = iso(we), today = todayIso();
+    $("weeklabel").textContent = weekOffset === 0 ? `This week · ${MONTHS[ws.getMonth()]} ${ws.getDate()}` :
+      `${MONTHS[ws.getMonth()]} ${ws.getDate()} – ${MONTHS[we.getMonth()]} ${we.getDate()}`;
+
+    const inWeek = entries.filter(e => e.date >= wsI && e.date <= weI);
+
+    // summary
+    const a = inWeek.filter(e => e.kind === "assignment"), aDone = a.filter(e => e.done).length;
+    $("s-assign").innerHTML = `${a.length - aDone}<small>left</small>`;
+    $("b-assign").style.width = a.length ? `${aDone / a.length * 100}%` : "0";
+    const late = entries.filter(e => e.kind === "assignment" && !e.done && e.date < today).length;
+    $("s-assign-sub").textContent = a.length ? `${aDone} of ${a.length} done${late ? ` · ${late} overdue` : ""}` : (late ? `${late} overdue from earlier` : "Nothing due this week");
+
+    const w = inWeek.filter(e => e.kind === "workout");
+    const wDone = w.filter(e => e.done).reduce((s, e) => s + (e.minutes || 0), 0);
+    const wPlan = w.reduce((s, e) => s + (e.minutes || 0), 0);
+    $("s-work").innerHTML = `${wDone}<small>min</small>`;
+    $("b-work").style.width = `${Math.min(100, wDone / WORKOUT_GOAL * 100)}%`;
+    $("s-work-sub").textContent = `${w.filter(e => e.done).length} of ${w.length} sessions · goal ${WORKOUT_GOAL} min` + (wPlan > wDone ? ` · ${wPlan} planned` : "");
+
+    const s = inWeek.filter(e => e.kind === "shift");
+    const sHrs = s.reduce((t, e) => t + shiftHours(e), 0), sDone = s.filter(e => e.done).reduce((t, e) => t + shiftHours(e), 0);
+    $("s-shift").innerHTML = `${fmtHrs(sHrs)}<small>hrs</small>`;
+    $("b-shift").style.width = sHrs ? `${sDone / sHrs * 100}%` : "0";
+    $("s-shift-sub").textContent = s.length ? `${s.length} shift${s.length > 1 ? "s" : ""} · ${fmtHrs(sDone)} hrs worked` : "No shifts scheduled";
+
+    // agenda
+    const shown = inWeek.filter(e => filter === "all" || e.kind === filter);
+    const box = $("days");
+    if (!shown.length) {
+      const what = filter === "all" ? "items" : filter + "s";
+      box.innerHTML = `<div class="empty"><b>No ${what} this week</b>Add one with the form. Use the arrows to look at other weeks.</div>`;
+      return;
+    }
+    const sortKey = (e) => e.kind === "shift" ? e.start : e.kind === "assignment" ? (e.dueTime || "23:59") : "12:00";
+    let html = "";
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws); d.setDate(d.getDate() + i);
+      const dI = iso(d);
+      const list = shown.filter(e => e.date === dI).sort((x, y) => sortKey(x).localeCompare(sortKey(y)) || x.createdAt - y.createdAt);
+      if (!list.length) continue;
+      const hrs = list.filter(e => e.kind === "shift").reduce((t, e) => t + shiftHours(e), 0);
+      const wm = list.filter(e => e.kind === "workout").reduce((t, e) => t + (e.minutes || 0), 0);
+      const tot = [hrs ? `${fmtHrs(hrs)}h work` : "", wm ? `${wm}m move` : ""].filter(Boolean).join(" · ");
+      html += `<div class="day"><div class="dayhead"><b>${DAYS[d.getDay()]}</b><span>${MONTHS[d.getMonth()]} ${d.getDate()}</span>${dI === today ? '<span class="today">Today</span>' : ""}<span class="tot">${tot}</span></div><div class="items">`;
+      for (const e of list) {
+        let meta = `<span class="kindtag">${e.kind[0].toUpperCase() + e.kind.slice(1)}</span>`;
+        if (e.kind === "assignment") meta += `<span class="mono">due ${fmtTime(e.dueTime)}</span>`;
+        if (e.kind === "workout") meta += `<span class="mono">${e.minutes} min</span>`;
+        if (e.kind === "shift") meta += `<span class="mono">${fmtTime(e.start)}–${fmtTime(e.end)} · ${fmtHrs(shiftHours(e))}h</span>`;
+        if (e.detail) meta += `<span>${esc(e.detail)}</span>`;
+        if (e.kind === "assignment" && !e.done && e.date < today) meta += `<span class="pill late">Overdue</span>`;
+        const verb = e.kind === "assignment" ? "done" : e.kind === "workout" ? "completed" : "worked";
+        html += `<div class="item k-${e.kind}${e.done ? " done" : ""}" data-id="${esc(e.id)}">
+          <span class="stripe"></span>
+          <button class="check" type="button" aria-pressed="${!!e.done}" aria-label="Mark ${esc(e.title)} ${verb}"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.5 5 9l5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="min-width:0"><div class="title">${esc(e.title)}</div><div class="meta">${meta}</div></div>
+          <div class="acts"><button class="del${pendingDelete === e.id ? " confirm" : ""}" type="button">${pendingDelete === e.id ? "Delete?" : "Remove"}</button></div>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+    box.innerHTML = html;
+  }
+
+  render();
+
+  // ---- storage ----
+  (async () => {
+    const db = window.claude ? await window.claude.use("db") : null;
+    if (!db) { setStatus("Saving is off in this view. Changes last until you close the page."); return; }
+    col = db.collection("entries");
+    const timer = setTimeout(() => setStatus("Can't reach your saved items yet…"), 10000);
+    col.onSnapshot((snap) => {
+      entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!snap.metadata.fromCache) { clearTimeout(timer); setStatus(`${entries.length} item${entries.length === 1 ? "" : "s"} saved`); }
+      render();
+    }, (err) => {
+      clearTimeout(timer);
+      setStatus(err.code === "revoked" ? "Saving stopped in this view." : "Lost the connection to your saved items.");
+      col = null;
+    });
+  })();
+})();
+</script>
