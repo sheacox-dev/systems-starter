@@ -1,0 +1,6 @@
+this is my friend who is trying to find a job but gets frustrated not hearing back 
+1. i found a job posting online that i thought i was qualified for. i submitted my resume and filled out the application. i received an automated confirmation email, but i never heard anything else. i applied to several other positions and experienced the same thing 
+2. the hardest part is not knowing why im not getting hired. i don't know if my resume isn't strong enough, if i'm missing qualifications, or if employers are simply choosing other candidates. not receiving feedback makes it difficult to improve
+3. it happens pretty frequently i apply to multiple jobs every week, and most employers never respond. sometimes i get rejection emails but usually don't hear anything back
+4. i mainly use linkedin, indeed, and company career websites to find jobs. i keep track of applications through email and sometimes write down the positions i apply for.
+5. i've tried applying to as many jobs as possible, changing my resume slightly for different positions, and following up with employers. i've also tried using different job search websites, but i still struggle to get responses. 
