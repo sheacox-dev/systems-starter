@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Problem Tracker</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f5;
+      --surface: #ffffff;
+      --text: #1c2523;
+      --muted: #5c6b67;
+      --border: #cfd8d5;
+      --accent: #0f6b5c;
+      --accent-text: #ffffff;
+      --error: #b3261e;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141a19;
+        --surface: #1d2523;
+        --text: #e6edeb;
+        --muted: #9aaaa5;
+        --border: #35423f;
+        --accent: #5cc4b0;
+        --accent-text: #0b1f1b;
+        --error: #ff8a80;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, sans-serif;
+    }
+
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 16px 64px;
+    }
+
+    h1 { margin: 0 0 24px; font-size: 1.75rem; line-height: 1.2; }
+    h2 { margin: 40px 0 12px; font-size: 1.125rem; }
+
+    form, .problem {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    label { display: block; margin-bottom: 4px; font-weight: 600; }
+
+    .optional { color: var(--muted); font-weight: 400; }
+
+    input, textarea, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 16px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: inherit;
+      font: inherit;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .fields { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+
+    .problem label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    .problem select {
+      width: auto;
+      margin: 0;
+      padding: 4px 8px;
+      color: var(--text);
+    }
+
+    textarea { min-height: 88px; resize: vertical; }
+
+    button {
+      padding: 8px 16px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .delete {
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--error);
+      font-size: 0.875rem;
+    }
+
+    button:hover { filter: brightness(1.1); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .error { margin: 12px 0 0; color: var(--error); }
+    .empty { color: var(--muted); }
+
+    ul { margin: 0; padding: 0; list-style: none; }
+
+    .problem { margin-bottom: 12px; overflow-wrap: anywhere; }
+    .problem h3 { margin: 0; font-size: 1rem; }
+    .problem p { margin: 8px 0 0; white-space: pre-wrap; }
+    .problem time { color: var(--muted); font-size: 0.875rem; }
+
+    /* Faded with colors, not opacity, so text and focus outlines stay readable. */
+    .problem.solved { background: var(--bg); }
+    .problem.solved, .problem.solved select, .problem.solved .delete { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Problem Tracker</h1>
+
+    <form id="problem-form">
+      <label for="title">Title</label>
+      <input id="title" type="text" maxlength="120" autocomplete="off" required autofocus>
+
+      <label for="description">Description <span class="optional">(optional)</span></label>
+      <textarea id="description"></textarea>
+
+      <label for="frequency">Frequency</label>
+      <select id="frequency" required></select>
+
+      <label for="status">Status</label>
+      <select id="status" required></select>
+
+      <button type="submit">Add problem</button>
+      <p id="error" class="error" role="alert" hidden></p>
+    </form>
+
+    <h2 id="list-heading">Problems</h2>
+    <label for="search">Search by title</label>
+    <input id="search" type="search" autocomplete="off">
+    <label for="status-filter">Filter by status</label>
+    <select id="status-filter" autocomplete="off"></select>
+    <p id="empty" class="empty" role="status"></p>
+    <ul id="problem-list" aria-labelledby="list-heading"></ul>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "problem-tracker.problems";
+
+    const FREQUENCIES = [
+      { value: "daily", label: "Daily" },
+      { value: "weekly", label: "Weekly" },
+      { value: "monthly", label: "Monthly" },
+      { value: "rarely", label: "Rarely" },
+    ];
+
+    const DEFAULT_STATUS = "open";
+
+    const STATUSES = [
+      { value: DEFAULT_STATUS, label: "Open" },
+      { value: "in-progress", label: "In progress" },
+      { value: "solved", label: "Solved" },
+    ];
+
+    const form = document.getElementById("problem-form");
+    const titleInput = document.getElementById("title");
+    const descriptionInput = document.getElementById("description");
+    const frequencyInput = document.getElementById("frequency");
+    const statusInput = document.getElementById("status");
+    const errorMessage = document.getElementById("error");
+    const searchInput = document.getElementById("search");
+    const statusFilter = document.getElementById("status-filter");
+    const emptyMessage = document.getElementById("empty");
+    const list = document.getElementById("problem-list");
+
+    // Reads from localStorage every time, so a second open tab can't cause
+    // this one to overwrite problems it doesn't know about.
+    function loadProblems() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === null) return [];
+      const problems = JSON.parse(saved);
+      if (!Array.isArray(problems)) throw new Error("Saved data is not a list");
+      return problems;
+    }
+
+    function saveProblems(problems) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(problems));
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.hidden = false;
+    }
+
+    function clearError() {
+      errorMessage.hidden = true;
+      errorMessage.textContent = "";
+    }
+
+    function isFrequency(value) {
+      return FREQUENCIES.some((frequency) => frequency.value === value);
+    }
+
+    function isStatus(value) {
+      return STATUSES.some((status) => status.value === value);
+    }
+
+    // Problems saved before status existed count as open.
+    function getStatus(problem) {
+      return isStatus(problem.status) ? problem.status : DEFAULT_STATUS;
+    }
+
+    function isSolved(problem) {
+      return getStatus(problem) === "solved";
+    }
+
+    // Fills a dropdown with a placeholder (shown until one is picked) and the
+    // frequencies. The placeholder can't be picked again afterwards.
+    function fillFrequencyOptions(select, placeholderText) {
+      const placeholder = new Option(placeholderText, "", true, true);
+      placeholder.disabled = true;
+      const options = FREQUENCIES.map(({ value, label }) => new Option(label, value));
+      select.replaceChildren(placeholder, ...options);
+    }
+
+    // The selected status is also the one form.reset() goes back to.
+    function fillStatusOptions(select, selected) {
+      const options = STATUSES.map(({ value, label }) =>
+        new Option(label, value, value === selected, value === selected));
+      select.replaceChildren(...options);
+    }
+
+    function updateField(id, field, value) {
+      try {
+        const problems = loadProblems();
+        const problem = problems.find((saved) => saved.id === id);
+        if (!problem) throw new Error("Problem is no longer saved");
+        problem[field] = value;
+        saveProblems(problems);
+        clearError();
+        return true;
+      } catch (error) {
+        console.error(error);
+        showError(`The ${field} couldn't be saved.`);
+        return false;
+      }
+    }
+
+    function createFrequencyField(problem) {
+      const select = document.createElement("select");
+      fillFrequencyOptions(select, "Not rated");
+      // Problems saved before frequency existed stay on "Not rated".
+      let savedValue = isFrequency(problem.frequency) ? problem.frequency : "";
+      select.value = savedValue;
+
+      select.addEventListener("change", () => {
+        if (updateField(problem.id, "frequency", select.value)) {
+          savedValue = select.value;
+        } else {
+          select.value = savedValue;
+        }
+      });
+
+      const label = document.createElement("label");
+      label.append("Frequency", select);
+      return label;
+    }
+
+    function createStatusField(problem) {
+      const select = document.createElement("select");
+      select.className = "status";
+      fillStatusOptions(select, getStatus(problem));
+
+      select.addEventListener("change", () => {
+        if (!updateField(problem.id, "status", select.value)) {
+          select.value = getStatus(problem);
+          return;
+        }
+
+        problem.status = select.value;
+        if (matchesStatus(problem)) {
+          select.closest(".problem").classList.toggle("solved", isSolved(problem));
+          return;
+        }
+
+        const position = [...list.querySelectorAll(".status")].indexOf(select);
+        refresh();
+        focusNearby(".status", position);
+      });
+
+      const label = document.createElement("label");
+      label.append("Status", select);
+      return label;
+    }
+
+    // Keeps keyboard users near where they were after a problem leaves the list.
+    function focusNearby(selector, position) {
+      const remaining = list.querySelectorAll(selector);
+      const next = remaining[Math.min(position, remaining.length - 1)];
+      if (next) next.focus();
+      else if (searchInput.value) searchInput.focus();
+      else if (statusFilter.value) statusFilter.focus();
+      else titleInput.focus();
+    }
+
+    function deleteProblem(problem, deleteButton) {
+      if (!confirm(`Delete "${problem.title}"? This can't be undone.`)) return;
+
+      const position = [...list.querySelectorAll(".delete")].indexOf(deleteButton);
+
+      try {
+        const problems = loadProblems().filter((saved) => saved.id !== problem.id);
+        saveProblems(problems);
+        render(problems);
+        clearError();
+      } catch (error) {
+        console.error(error);
+        showError("The problem couldn't be deleted.");
+        return;
+      }
+
+      focusNearby(".delete", position);
+    }
+
+    function createDeleteButton(problem) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "delete";
+      button.textContent = "Delete";
+      button.setAttribute("aria-label", `Delete ${problem.title}`);
+      button.addEventListener("click", () => deleteProblem(problem, button));
+      return button;
+    }
+
+    // Uses textContent, not innerHTML, so typed text is never run as HTML.
+    function createProblemItem(problem) {
+      const item = document.createElement("li");
+      item.className = "problem";
+      item.classList.toggle("solved", isSolved(problem));
+
+      const title = document.createElement("h3");
+      title.textContent = problem.title;
+      item.append(title);
+
+      const time = document.createElement("time");
+      time.dateTime = problem.createdAt;
+      time.textContent = new Date(problem.createdAt).toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+      item.append(time);
+
+      if (problem.description) {
+        const description = document.createElement("p");
+        description.textContent = problem.description;
+        item.append(description);
+      }
+
+      const fields = document.createElement("div");
+      fields.className = "fields";
+      fields.append(createFrequencyField(problem), createStatusField(problem));
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.append(fields, createDeleteButton(problem));
+      item.append(actions);
+
+      return item;
+    }
+
+    function matchesSearch(problem) {
+      const query = searchInput.value.trim().toLowerCase();
+      return problem.title.toLowerCase().includes(query);
+    }
+
+    function matchesStatus(problem) {
+      return !statusFilter.value || getStatus(problem) === statusFilter.value;
+    }
+
+    // Shows only the problems that match both the search box and the status
+    // filter. An empty search and "All" match everything.
+    function render(problems) {
+      const matches = problems.filter((problem) => matchesSearch(problem) && matchesStatus(problem));
+      emptyMessage.textContent = problems.length === 0
+        ? "No problems yet. Add the first one you notice."
+        : "No matching problems.";
+      emptyMessage.hidden = matches.length > 0;
+      list.replaceChildren(...matches.map(createProblemItem));
+    }
+
+    function refresh() {
+      try {
+        render(loadProblems());
+        clearError();
+      } catch (error) {
+        console.error(error);
+        emptyMessage.hidden = true;
+        showError("Your saved problems couldn't be read.");
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const title = titleInput.value.trim();
+      if (!title) {
+        showError("Enter a title.");
+        titleInput.focus();
+        return;
+      }
+
+      if (!isFrequency(frequencyInput.value)) {
+        showError("Choose a frequency.");
+        frequencyInput.focus();
+        return;
+      }
+
+      if (!isStatus(statusInput.value)) {
+        showError("Choose a status.");
+        statusInput.focus();
+        return;
+      }
+
+      const problem = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        title,
+        description: descriptionInput.value.trim(),
+        frequency: frequencyInput.value,
+        status: statusInput.value,
+        createdAt: new Date().toISOString(),
+      };
+
+      try {
+        const problems = [problem, ...loadProblems()]; // newest first
+        saveProblems(problems);
+        // So the new problem is never hidden by a search or filter.
+        searchInput.value = "";
+        statusFilter.value = "";
+        render(problems);
+      } catch (error) {
+        console.error(error);
+        showError("The problem couldn't be saved. Your text is still in the form.");
+        return;
+      }
+
+      clearError();
+      form.reset();
+      titleInput.focus();
+    });
+
+    searchInput.addEventListener("input", refresh);
+    statusFilter.addEventListener("change", refresh);
+
+    // Update when another tab changes the list.
+    window.addEventListener("storage", (event) => {
+      if (event.key === STORAGE_KEY || event.key === null) refresh();
+    });
+
+    fillFrequencyOptions(frequencyInput, "How often does it happen?");
+    fillStatusOptions(statusInput, DEFAULT_STATUS);
+    fillStatusOptions(statusFilter, "");
+    statusFilter.prepend(new Option("All", "", true, true));
+    refresh();
+  </script>
+</body>
+</html>

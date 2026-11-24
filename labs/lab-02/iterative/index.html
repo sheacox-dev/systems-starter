@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problem Tracker</title>
+<style>
+  * { box-sizing: border-box; }
+  body { max-width: 640px; margin: 0 auto; padding: 32px 16px; background: #f6f7f6; color: #1c2420; font: 16px/1.5 system-ui, sans-serif; }
+  h1 { margin: 0 0 20px; font-size: 24px; }
+  h2 { margin: 32px 0 12px; font-size: 18px; }
+  form, li { padding: 16px; background: #fff; border: 1px solid #d5ddd8; border-radius: 8px; }
+  label { display: block; margin-bottom: 12px; font-weight: 600; }
+  input, textarea { display: block; width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid #8a978f; border-radius: 6px; font: inherit; }
+  textarea { resize: vertical; }
+  button { padding: 9px 16px; border: 0; border-radius: 6px; background: #0e6a4e; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  button:hover { background: #0a523c; }
+  :focus-visible { outline: 2px solid #0e6a4e; outline-offset: 2px; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { margin-bottom: 10px; overflow-wrap: anywhere; }
+  h3 { margin: 0; font-size: 16px; }
+  li p { margin: 4px 0 0; white-space: pre-wrap; }
+  #empty { color: #55625b; }
+  #error { margin: 0 0 12px; color: #b3261e; }
+</style>
+</head>
+<body>
+  <h1>Problem Tracker</h1>
+
+  <form id="form" novalidate>
+    <label>Title <input id="title" maxlength="200" autocomplete="off"></label>
+    <label>Description (optional) <textarea id="description" rows="3"></textarea></label>
+    <p id="error" role="alert" hidden></p>
+    <button>Add problem</button>
+  </form>
+
+  <h2>Problems</h2>
+  <p id="empty">No problems yet. Add the first one above.</p>
+  <ul id="list"></ul>
+
+<script>
+  // The name our data is saved under in the browser.
+  const KEY = 'lab02.iterative.problems.v1';
+
+  const form = document.getElementById('form');
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const error = document.getElementById('error');
+
+  // Each problem looks like { id, title, description }. Newest is first.
+  let problems = load();
+  render();
+
+  // Read the saved problems. localStorage only holds text, so JSON.parse turns it back into a list.
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY));
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      showError('Your saved problems could not be read. Adding a new one will replace them.');
+      return [];
+    }
+  }
+
+  function showError(message) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+
+  // Redraw the whole list from the problems array.
+  function render() {
+    const list = document.getElementById('list');
+    list.replaceChildren();
+    for (const problem of problems) {
+      const item = document.createElement('li');
+      const heading = document.createElement('h3');
+      heading.textContent = problem.title; // textContent treats what you typed as plain text
+      item.append(heading);
+      if (problem.description) {
+        const text = document.createElement('p');
+        text.textContent = problem.description;
+        item.append(text);
+      }
+      list.append(item);
+    }
+    document.getElementById('empty').hidden = problems.length > 0;
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault(); // stop the browser from reloading the page
+    const newTitle = title.value.trim();
+    if (!newTitle) {
+      showError('Give the problem a title.');
+      title.focus();
+      return;
+    }
+
+    const problem = { id: Date.now(), title: newTitle, description: description.value.trim() };
+    const updated = [problem, ...problems];
+    try {
+      localStorage.setItem(KEY, JSON.stringify(updated));
+    } catch {
+      showError('The problem could not be saved in this browser.');
+      return; // keep what you typed in the form
+    }
+
+    problems = updated;
+    showError('');
+    form.reset();
+    render();
+    title.focus(); // ready for the next one
+  });
+</script>
+</body>
+</html>
