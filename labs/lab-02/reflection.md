@@ -1,0 +1,6 @@
+https://systems-starter-problem-tracker.vercel.app
+2 unwanted things was the format, i think it is a little bit confusing and it is not the nicest to look at it but it is functional. 2 things i like is the calendar and within the calendar there is priority levels showing critical, high, medium and low. i also like that you can assign tasks to someone, this could be very helpful for group projects.
+in a fresh session i asked for a search box using any library claude read claude.md mentioned the no dependencies rule and used plain javascript instead of a new library this shows that decisions written in claude.md carry over to new sessions while things said only in chat are forgotten when the session ends 
+i added a deny rule in .claude/settings.json for rm-rf and git push -- force. when i asked claude to run rm - rf test folder it was blocked 
+laptop - it looked pretty similar to when i was viewing it while making it but still it is very functional
+phone - it looked a lot more condensed than when on the computer i would reccomend that you start use on computer then move to the phone
