@@ -1,0 +1,3 @@
+honestly nothing failed, the criterion i was most worried about was specs since i have never used it before but all of the tests were successful
+drawing the first flow showed two causes a first visit and lost data, both end up on the same empty screen.
+my tester finished without getting stuck. the one thing i noticed was that it took a lot longer than i thought. when i went to check the test there was an error but i was able to trouble shoot the error. 
