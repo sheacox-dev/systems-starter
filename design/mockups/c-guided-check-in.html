@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup C: Guided check-in</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; background: #e9e9e7; color: #222; font: 16px/1.45 system-ui, sans-serif; }
+  .caption, .note { max-width: 620px; margin: 0 auto; font-size: 14px; color: #444; }
+  .caption { margin-bottom: 14px; }
+  .note { margin-top: 18px; padding-top: 12px; border-top: 1px solid #aaa; }
+  .screen { max-width: 620px; margin: 0 auto; background: #fff; border: 2px solid #222; border-radius: 12px; overflow: hidden; }
+  .banner { background: #222; color: #fff; padding: 12px 28px; font-size: 15px; }
+  main { padding: 26px 28px 30px; }
+  h1 { margin: 0; font-size: 26px; }
+  .sub { margin: 2px 0 22px; color: #555; }
+  .answered { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; padding: 12px 0; border-top: 1px solid #bbb; }
+  .answered span:last-child { color: #555; }
+  .ask { border: 2px solid #222; border-radius: 10px; padding: 20px; margin: 6px 0 26px; }
+  .ask h2 { margin: 0 0 14px; font-size: 20px; }
+  .fields { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  label { display: block; font-size: 13px; color: #555; }
+  input { width: 100%; font: inherit; padding: 10px; border: 1px solid #777; border-radius: 6px; margin-top: 3px; background: #fff; color: #222; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  button { font: inherit; font-weight: 650; padding: 11px 20px; border: 2px solid #222; border-radius: 8px; background: #fff; color: #222; }
+  .primary { background: #222; color: #fff; }
+  .next { border: 1px dashed #777; border-radius: 10px; padding: 18px 20px; }
+  .next p { margin: 0; color: #555; font-size: 14px; }
+  .next strong { display: block; font-size: 20px; margin: 2px 0; }
+  .foot { display: flex; justify-content: space-between; margin-top: 18px; color: #555; font-size: 15px; }
+  .foot u { color: #222; }
+  @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } main { padding: 20px 18px; } .banner { padding: 12px 18px; } }
+</style>
+</head>
+<body>
+<p class="caption"><strong>Mockup C: Guided check-in.</strong> Flow: open the app → answer three "anything new?" questions → get one thing to do. The app asks; the student never has to go looking for Add.</p>
+
+<div class="screen">
+  <div class="banner" role="status">
+    <div><b>Overdue</b>&ensp;Stats discussion reply, Sun 11:59 PM</div>
+    <div><b>Due soon</b>&ensp;Econ problem set 7, Tue 11:59 PM</div>
+  </div>
+  <main>
+    <h1>Anything new since Saturday?</h1>
+    <p class="sub">Monday, November 30, 4:10 PM</p>
+
+    <div class="answered"><span>Assignments in Canvas</span><span>Added English essay draft, Fri 5:00 PM</span></div>
+    <div class="answered"><span>Shifts in Google Calendar</span><span>Nothing new</span></div>
+
+    <section class="ask">
+      <h2>Any new internship tasks?</h2>
+      <div class="fields">
+        <label>Name<input value="Slide edits for team check-in"></label>
+        <label>Due<input value="Thu Dec 3, 12:00 PM"></label>
+      </div>
+      <div class="buttons"><button class="primary">Save and add another</button><button>Nothing else</button></div>
+    </section>
+
+    <div class="next">
+      <p>After this, your one thing is</p>
+      <strong>Stats discussion reply</strong>
+      <p>Assignment, overdue since Sun 11:59 PM</p>
+    </div>
+    <div class="foot"><span>+9 more this week</span><span><u>Skip check-in</u>&emsp;<u>See week</u></span></div>
+  </main>
+</div>
+
+<p class="note">This assumes the student will forget to update the app unless it asks, as they did with a planner, but will answer three quick questions when they open it. It also assumes they would rather be handed one thing to do than compare several.</p>
+</body>
+</html>

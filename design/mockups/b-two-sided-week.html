@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup B: Two-sided week</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; background: #e9e9e7; color: #222; font: 16px/1.4 system-ui, sans-serif; }
+  .caption, .note { max-width: 1060px; margin: 0 auto; font-size: 14px; color: #444; }
+  .caption { margin-bottom: 14px; }
+  .note { margin-top: 18px; padding-top: 12px; border-top: 1px solid #aaa; }
+  .screen { max-width: 1060px; margin: 0 auto; background: #fff; border: 2px solid #222; border-radius: 8px; overflow: hidden; }
+  .banner { background: #222; color: #fff; padding: 12px 24px; font-size: 15px; display: flex; flex-wrap: wrap; gap: 4px 36px; }
+  header { padding: 20px 24px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px; }
+  h1 { margin: 0; font-size: 24px; }
+  header p { margin: 0; color: #555; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th, td { border-top: 1px solid #bbb; padding: 10px 14px; vertical-align: top; text-align: left; }
+  thead th { font-size: 14px; color: #555; font-weight: 600; }
+  .school { text-align: right; }
+  th.day { width: 150px; text-align: center; background: #f4f4f2; border-left: 1px solid #bbb; border-right: 1px solid #bbb; font-weight: 650; }
+  .busy td { background: #f0eee2; }
+  .busy th.day { background: #e2dcc0; }
+  .tag { display: block; font-size: 13px; font-weight: 700; margin-top: 3px; }
+  .item { padding: 2px 0; }
+  .item small { display: block; font-size: 13px; color: #555; }
+  .rank { display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #222; color: #fff; text-align: center; font-size: 13px; font-weight: 700; }
+  .plus { font: inherit; font-size: 14px; color: #555; background: none; border: 1px dashed #999; border-radius: 6px; padding: 5px 12px; }
+  .form { border: 2px solid #222; border-radius: 6px; padding: 10px; background: #fff; text-align: left; }
+  .form label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+  .form input { width: 100%; font: inherit; padding: 7px; border: 1px solid #777; border-radius: 4px; }
+  .form div { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; margin-top: 8px; font-size: 14px; }
+  .form button { font: inherit; font-weight: 650; padding: 6px 16px; border: 0; border-radius: 4px; background: #222; color: #fff; }
+  @media (max-width: 640px) { th.day { width: 84px; } th, td { padding: 8px; font-size: 14px; overflow-wrap: anywhere; } }
+</style>
+</head>
+<body>
+<p class="caption"><strong>Mockup B: Two-sided week.</strong> Flow: open the app → scan the week for collisions → click a side of a day to add there. There is no Today screen; the numbers 1 to 3 show what to do first.</p>
+
+<div class="screen">
+  <div class="banner" role="status">
+    <div><b>Overdue</b>&ensp;Stats discussion reply, Sun 11:59 PM</div>
+    <div><b>Due soon</b>&ensp;Econ problem set 7, Tue 11:59 PM</div>
+  </div>
+  <header><h1>This week</h1><p>Now: Monday, November 30, 4:10 PM</p></header>
+  <table>
+    <thead><tr><th class="school">School</th><th class="day">Day</th><th>Work and internship</th></tr></thead>
+    <tbody>
+      <tr><td class="school"><div class="item"><span class="rank">1</span> Stats discussion reply<small>Assignment, overdue</small></div></td><th class="day">Sun 29</th><td></td></tr>
+      <tr><td class="school"><button class="plus">+ Add</button></td><th class="day">Mon 30, today</th><td><div class="item"><span class="rank">2</span> Coffee shop shift<small>Work shift, 5:00 PM</small></div></td></tr>
+      <tr class="busy"><td class="school"><div class="item">Econ problem set 7<small>Assignment, 11:59 PM</small></div></td><th class="day">Tue 1<span class="tag">Busy day</span></th><td><div class="item"><span class="rank">3</span> Weekly analytics summary<small>Internship, 3:00 PM</small></div></td></tr>
+      <tr class="busy"><td class="school"><div class="item">Marketing case write-up<small>Assignment, 11:59 PM</small></div></td><th class="day">Wed 2<span class="tag">Busy day</span></th><td><div class="item">Coffee shop shift<small>Work shift, 4:00 PM</small></div></td></tr>
+      <tr><td class="school"><div class="form"><label for="n">New assignment</label><input id="n" value="Econ chapter 9 quiz"><div><span>Assignment, Thu Dec 3</span><button>Save</button></div></div></td><th class="day">Thu 3</th><td><div class="item">Slide edits for team check-in<small>Internship, 12:00 PM</small></div></td></tr>
+      <tr class="busy"><td class="school"><div class="item">English essay draft<small>Assignment, 5:00 PM</small></div></td><th class="day">Fri 4<span class="tag">Busy day</span></th><td><div class="item">Coffee shop shift<small>Work shift, 5:00 PM</small></div></td></tr>
+      <tr><td class="school"><button class="plus">+ Add</button></td><th class="day">Sat 5</th><td><div class="item">Coffee shop shift<small>Work shift, 8:00 AM</small></div></td></tr>
+      <tr><td class="school"><div class="item">Stats homework 10<small>Assignment, 11:59 PM</small></div></td><th class="day">Sun 6</th><td><button class="plus">+ Add</button></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p class="note">This assumes the student plans ahead on a laptop and chooses better when school and work sit side by side than when a list chooses for them. It also assumes that seeing the whole week at once will not overwhelm them the way long to-do lists did.</p>
+</body>
+</html>

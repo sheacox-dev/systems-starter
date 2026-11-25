@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup A: Today first</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; background: #e9e9e7; color: #222; font: 16px/1.45 system-ui, sans-serif; }
+  .caption, .note { max-width: 390px; margin: 0 auto; font-size: 14px; color: #444; }
+  .caption { margin-bottom: 14px; }
+  .note { margin-top: 18px; padding-top: 12px; border-top: 1px solid #aaa; }
+  .phone { max-width: 390px; min-height: 740px; margin: 0 auto; background: #fff; border: 2px solid #222; border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; }
+  .banner { background: #222; color: #fff; padding: 16px 20px; font-size: 14px; }
+  .banner div + div { margin-top: 6px; }
+  .banner b { display: inline-block; min-width: 76px; }
+  main { padding: 22px 20px; flex: 1; }
+  h1 { margin: 0; font-size: 28px; }
+  .date { margin: 0 0 18px; color: #555; }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; gap: 14px; align-items: center; border: 1px solid #999; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .check { flex: none; width: 44px; height: 44px; border: 2px solid #555; border-radius: 50%; background: #fff; }
+  .type { font-size: 13px; color: #555; }
+  .name { font-weight: 650; font-size: 17px; }
+  .when { font-size: 14px; }
+  .more { text-align: center; color: #555; margin: 16px 0; }
+  .add { display: block; width: 100%; padding: 15px; font: inherit; font-weight: 650; background: #fff; border: 2px solid #222; border-radius: 12px; }
+  nav { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #999; }
+  nav span { padding: 16px; text-align: center; color: #555; }
+  nav .on { color: #222; font-weight: 700; box-shadow: inset 0 3px #222; }
+</style>
+</head>
+<body>
+<p class="caption"><strong>Mockup A: Today first.</strong> Flow: open the app → see three things → tap one done → the next moves up. Week and Add are separate screens.</p>
+
+<div class="phone">
+  <div class="banner" role="status">
+    <div><b>Overdue</b> Stats discussion reply, Sun 11:59 PM</div>
+    <div><b>Due soon</b> Econ problem set 7, Tue 11:59 PM</div>
+  </div>
+  <main>
+    <h1>Today</h1>
+    <p class="date">Monday, November 30, 4:10 PM</p>
+    <ol>
+      <li><button class="check" aria-label="Mark Stats discussion reply done"></button>
+        <div><div class="type">Assignment</div><div class="name">Stats discussion reply</div><div class="when">Overdue, was due Sun 11:59 PM</div></div></li>
+      <li><button class="check" aria-label="Mark Coffee shop shift done"></button>
+        <div><div class="type">Work shift</div><div class="name">Coffee shop shift</div><div class="when">Today, 5:00 PM</div></div></li>
+      <li><button class="check" aria-label="Mark Weekly analytics summary done"></button>
+        <div><div class="type">Internship</div><div class="name">Weekly analytics summary</div><div class="when">Tomorrow, 3:00 PM</div></div></li>
+    </ol>
+    <p class="more">+8 more this week</p>
+    <button class="add">Add</button>
+  </main>
+  <nav aria-label="Screens"><span class="on">Today</span><span>Week</span></nav>
+</div>
+
+<p class="note">This assumes the student checks their phone in short gaps, like right before a shift, and wants an answer instead of an overview. It also assumes they trust "soonest due first" enough to act on three items without seeing the rest of the week.</p>
+</body>
+</html>
