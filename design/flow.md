@@ -1,8 +1,109 @@
-# Process flow: the main loop (S1 to S3)
+# Process flow
 
-This flow covers the student's main task: get everything into one place, then see what to do first. Everything happens on one screen, the two-sided week in [Mockup B](mockups/b-two-sided-week.html). It includes the empty state, the validation errors, and what happens when the list runs out.
+## S1, put everything in one place
 
-There is one role (the student) and no other system in v1, so the diagram needs no swimlanes. If Canvas or Google Calendar import is added later, give each one a subgraph.
+This flow covers S1 in [`specs/user-stories.md`](../specs/user-stories.md): opening the week, adding an item, checking it off, and moving between weeks. A shorter overview of S1 to S3 is at the end. Screen: [Mockup B](mockups/b-two-sided-week.html).
+
+There is one role (the student), and browser storage is part of the app, so there are no swimlanes.
+
+```mermaid
+flowchart TD
+  OPEN(["Student opens or reloads the app"]) --> READ{"Saved data present and readable as a whole? (S1-AC11)"}
+  READ -- No --> BAD["Error state: saved data missing or unreadable. Open an empty week without crashing (S1-AC11)"]
+  BAD --> EMPTY
+  READ -- Yes --> ANY{"Any saved items? (S1-AC8)"}
+  ANY -- No --> EMPTY["Empty week, today and next 6 days: Nothing here yet. Add your first assignment or shift. (S1-AC8, S1-AC9)"]
+  ANY -- Yes --> LOAD["Load every saved item, including whether it is done (S1-AC7)"]
+  LOAD --> EARLY{"Any unfinished items on an earlier day? (S1-AC14)"}
+  EARLY -- Yes --> OLD["Week view: today and next 6 days, plus those earlier days, checkbox on each item (S1-AC6, S1-AC9, S1-AC14)"]
+  EARLY -- No --> WEEK["Week view: today and next 6 days, checkbox on each item (S1-AC6, S1-AC9)"]
+
+  EMPTY --> ADD
+  OLD --> ADD
+  WEEK --> ADD
+
+  ADD{"Student clicks + Add? (S1-AC1, S1-AC2)"}
+  ADD -- Yes --> SIDE{"School side? (S1-AC1, S1-AC2)"}
+  SIDE -- Yes --> FS["Open Assignment form on that day, optional time, no type or date asked (S1-AC1, S1-AC10)"]
+  SIDE -- No --> FW["Open form on that day, asks Work shift or Internship, optional time, no date asked (S1-AC2, S1-AC10)"]
+  FS --> FORM["Form open: student fills it in"]
+  FW --> FORM
+
+  FORM --> CANCEL{"Student clicks Cancel? (S1-AC17)"}
+  CANCEL -- Yes --> CLOSE["Close the form without saving (S1-AC17)"]
+  CLOSE --> ADD
+  CANCEL -- No --> CLICK["Student clicks Save"]
+  CLICK --> NAME{"Name filled in? (S1-AC4)"}
+  NAME -- No --> ENAME["Error, not saved: Give it a name, like 'Econ problem set' (S1-AC4)"]
+  ENAME -- "Form stays open, retry" --> FORM
+  NAME -- Yes --> WORK{"Work-and-internship side? (S1-AC5)"}
+  WORK -- Yes --> TYPE{"Type chosen? (S1-AC5)"}
+  TYPE -- No --> ETYPE["Error, not saved: Choose Work shift or Internship (S1-AC5)"]
+  ETYPE -- "Form stays open, retry" --> FORM
+  WORK -- No --> TIME
+  TYPE -- Yes --> TIME{"Time entered? (S1-AC10)"}
+  TIME -- No --> NOTIME["Treat as due at 11:59 PM that day (S1-AC10)"]
+  TIME -- Yes --> KEEP["Use the time entered (S1-AC10)"]
+  NOTIME --> SAVE
+  KEEP --> SAVE
+  SAVE{"Browser saved it? (S1-AC12)"}
+  SAVE -- No --> ESAVE["Error: Couldn't save. Try again. (S1-AC12)"]
+  ESAVE -- "Form stays open, retry" --> FORM
+  SAVE -- Yes --> SHOWN["Item appears on that side of that day, labeled with its type (S1-AC3)"]
+  SHOWN --> ADD
+
+  ADD -- No --> CHECK{"Student clicks an item's checkbox? (S1-AC6, S1-AC13)"}
+  CHECK -- Yes --> DONE{"Item already done? (S1-AC6, S1-AC13)"}
+  DONE -- No --> MARK["Mark done, keep on its day, crossed out (S1-AC6)"]
+  DONE -- Yes --> UNMARK["Mark unfinished, remove crossing-out (S1-AC13)"]
+  MARK --> KEPT{"Browser saved the change? (S1-AC7, S1-AC16)"}
+  UNMARK --> KEPT
+  KEPT -- No --> ECHECK["Undo the check. Error: Couldn't save. Try again. (S1-AC16)"]
+  ECHECK -- "Back to the week, retry" --> ADD
+  KEPT -- Yes --> ADD
+
+  CHECK -- No --> NAV{"Student clicks Later or Earlier? (S1-AC15)"}
+  NAV -- Yes --> MOVE["Show following or previous 7 days, + Add on every day (S1-AC15)"]
+  MOVE --> ADD
+  NAV -- No --> RELOAD{"Student reloads the page? (S1-AC7)"}
+  RELOAD -- Yes --> OPEN
+  RELOAD -- No --> STOP(["Student finishes looking at the week"])
+```
+
+### Which ACs each path covers
+
+| Path | ACs |
+|---|---|
+| Open, saved data missing or unreadable, empty week | S1-AC11, then S1-AC8 and S1-AC9 |
+| Open, data readable but no items, empty week | S1-AC8, S1-AC9 |
+| Open or reload with saved items | S1-AC6 (checkbox shown), S1-AC7, S1-AC9, S1-AC14 |
+| Add on the School side | S1-AC1, S1-AC3, S1-AC10 |
+| Add on the Work-and-internship side | S1-AC2, S1-AC3, S1-AC10 |
+| Empty name, retry | S1-AC4 |
+| No type chosen, retry | S1-AC5 |
+| Save fails, retry | S1-AC12 |
+| Cancel the form | S1-AC17 |
+| Check or uncheck an item | S1-AC6, S1-AC7, S1-AC13 |
+| Checkbox change can't be saved, retry | S1-AC16 |
+| Later or Earlier | S1-AC15 |
+
+### ACs the flow doesn't reach
+
+**None.** S1-AC1 to S1-AC17 each appear on at least one node.
+
+S2 and S3 criteria are not in this flow, because it covers S1 only. Their main steps are in the overview below.
+
+### Open questions
+
+These have no S1 criterion, so the diagram doesn't invent an answer:
+
+- **Both errors at once.** If the name and type are both missing, the diagram checks the name first. No criterion sets that order.
+- **First visit.** A new student has no saved data, so they take the S1-AC11 "missing" path. It looks the same as the normal empty week, but so does lost data.
+- **Later items after a reload.** S1-AC7 says every saved item still shows, but S1-AC9 shows only 7 days. Items further out need Later.
+
+## Overview: S1–S3
+
+This is the earlier diagram of the whole v1 loop, unchanged. It leaves out some newer S1 rules, such as save failures and Cancel. Where the two differ, follow the S1 flow above and [`specs/user-stories.md`](../specs/user-stories.md).
 
 ```mermaid
 flowchart TD

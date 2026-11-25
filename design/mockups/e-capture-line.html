@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup E: Capture line</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; background: #e9e9e7; color: #222; font: 16px/1.45 system-ui, sans-serif; }
+  .caption, .note, .label { max-width: 920px; margin: 0 auto; font-size: 14px; color: #444; }
+  .caption { margin-bottom: 14px; }
+  .label { margin-top: 28px; margin-bottom: 10px; }
+  .note { margin-top: 22px; padding-top: 12px; border-top: 1px solid #aaa; }
+  .screen { max-width: 920px; margin: 0 auto; background: #fff; border: 2px solid #222; border-radius: 10px; overflow: hidden; }
+  .capture { padding: 24px 28px; border-bottom: 2px solid #222; }
+  .capture label { display: block; font-size: 20px; font-weight: 650; margin-bottom: 8px; }
+  .capture input { width: 100%; font: inherit; font-size: 20px; padding: 14px; border: 2px solid #222; border-radius: 8px; color: #222; background: #fff; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
+  .chip { padding: 5px 12px; border: 1px solid #777; border-radius: 16px; background: #f4f4f2; }
+  button { font: inherit; font-size: 15px; font-weight: 650; padding: 8px 16px; border: 2px solid #222; border-radius: 8px; background: #fff; color: #222; }
+  .primary { background: #222; color: #fff; }
+  .push { margin-left: auto; }
+  .error { border-left: 4px solid #222; background: #f0eee2; padding: 8px 12px; margin-top: 12px; font-weight: 650; }
+  .panes { display: grid; grid-template-columns: 1fr 290px; }
+  .list { padding: 18px 28px 24px; }
+  .side { padding: 18px 22px 24px; background: #f4f4f2; border-left: 1px solid #bbb; }
+  h2 { margin: 0 0 8px; font-size: 16px; }
+  h3 { margin: 14px 0 2px; font-size: 13px; color: #555; font-weight: 650; }
+  h3 b { color: #222; background: #e2dcc0; padding: 1px 8px; border-radius: 10px; margin-left: 4px; }
+  .line { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; padding: 4px 0; align-items: center; }
+  .line input { width: 18px; height: 18px; }
+  .line span { color: #555; font-size: 14px; text-align: right; }
+  ol { margin: 0; padding-left: 22px; }
+  ol li { margin-bottom: 10px; font-weight: 650; }
+  ol small, .side p small { display: block; font-weight: 400; color: #555; font-size: 13px; }
+  .side h2:not(:first-child) { margin-top: 20px; }
+  .side p { margin: 0 0 8px; }
+  @media (max-width: 680px) { .panes { grid-template-columns: 1fr; } .side { border-left: 0; border-top: 1px solid #bbb; } .capture, .list { padding-left: 18px; padding-right: 18px; } .push { margin-left: 0; } }
+</style>
+</head>
+<body>
+<p class="caption"><strong>Mockup E: Capture line.</strong> Flow: open the app → type one line, as in a notes app → check what the app understood → Save. Adding is always on screen; the list and what to do first sit below it.</p>
+
+<div class="screen">
+  <div class="capture">
+    <label for="c">What's coming up?</label>
+    <input id="c" value="Econ chapter 9 quiz thu">
+    <div class="row"><span>Understood as:</span><span class="chip">Assignment</span><span class="chip">Thu, Dec 3</span><span class="chip">11:59 PM</span><button class="push">Cancel</button><button class="primary">Save</button></div>
+  </div>
+  <div class="panes">
+    <div class="list">
+      <h2>Everything, soonest first</h2>
+      <h3>Sun, Nov 29, overdue</h3>
+      <div class="line"><input type="checkbox" aria-label="Stats discussion reply done"><div>Stats discussion reply</div><span>Assignment, 11:59 PM</span></div>
+      <h3>Today, Mon, Nov 30</h3>
+      <div class="line"><input type="checkbox" aria-label="Mon coffee shop shift done"><div>Coffee shop shift</div><span>Work shift, 5:00 PM</span></div>
+      <h3>Tue, Dec 1 <b>Busy day</b></h3>
+      <div class="line"><input type="checkbox" aria-label="Weekly analytics summary done"><div>Weekly analytics summary</div><span>Internship, 3:00 PM</span></div>
+      <div class="line"><input type="checkbox" aria-label="Econ problem set 7 done"><div>Econ problem set 7</div><span>Assignment, 11:59 PM</span></div>
+      <h3>Wed, Dec 2 <b>Busy day</b></h3>
+      <div class="line"><input type="checkbox" aria-label="Wed coffee shop shift done"><div>Coffee shop shift</div><span>Work shift, 4:00 PM</span></div>
+      <div class="line"><input type="checkbox" aria-label="Marketing case write-up done"><div>Marketing case write-up</div><span>Assignment, 11:59 PM</span></div>
+      <h3>Thu, Dec 3</h3>
+      <div class="line"><input type="checkbox" aria-label="Slide edits done"><div>Slide edits for team check-in</div><span>Internship, 12:00 PM</span></div>
+      <h3>Fri, Dec 4 <b>Busy day</b></h3>
+      <div class="line"><input type="checkbox" aria-label="English essay draft done"><div>English essay draft</div><span>Assignment, 5:00 PM</span></div>
+      <div class="line"><input type="checkbox" aria-label="Fri coffee shop shift done"><div>Coffee shop shift</div><span>Work shift, 5:00 PM</span></div>
+      <h3>Sat, Dec 5</h3>
+      <div class="line"><input type="checkbox" aria-label="Sat coffee shop shift done"><div>Coffee shop shift</div><span>Work shift, 8:00 AM</span></div>
+      <h3>Sun, Dec 6</h3>
+      <div class="line"><input type="checkbox" aria-label="Stats homework 10 done"><div>Stats homework 10</div><span>Assignment, 11:59 PM</span></div>
+    </div>
+    <aside class="side">
+      <h2>Do first</h2>
+      <ol>
+        <li>Stats discussion reply<small>Overdue, was due Sun 11:59 PM</small></li>
+        <li>Coffee shop shift<small>Today, 5:00 PM</small></li>
+        <li>Weekly analytics summary<small>Tue, 3:00 PM</small></li>
+      </ol>
+      <h2>Due soon</h2>
+      <p>Econ problem set 7<small>Tue 11:59 PM, on a Busy day</small></p>
+    </aside>
+  </div>
+</div>
+
+<p class="label"><strong>Error state (S1-AC5):</strong> the line doesn't say whether this is a shift or an internship task, and the student clicked Save.</p>
+<div class="screen">
+  <div class="capture" style="border-bottom:0">
+    <label for="e1">What's coming up?</label>
+    <input id="e1" value="Team training fri 2pm" aria-describedby="e1m">
+    <div class="error" id="e1m" role="alert">Choose Work shift or Internship</div>
+    <div class="row"><button>Work shift</button><button>Internship</button><span class="chip">Fri, Dec 4</span><span class="chip">2:00 PM</span><button class="push">Cancel</button><button class="primary">Save</button></div>
+  </div>
+</div>
+
+<p class="label"><strong>Error state (S1-AC12):</strong> the line is valid, but the browser couldn't save it. The form stays open.</p>
+<div class="screen">
+  <div class="capture" style="border-bottom:0">
+    <label for="e2">What's coming up?</label>
+    <input id="e2" value="Econ chapter 9 quiz thu" aria-describedby="e2m">
+    <div class="error" id="e2m" role="alert">Couldn't save. Try again.</div>
+    <div class="row"><span class="chip">Assignment</span><span class="chip">Thu, Dec 3</span><span class="chip">11:59 PM</span><button class="push">Cancel</button><button class="primary">Save</button></div>
+  </div>
+</div>
+
+<p class="note">This assumes the student stops updating tools because adding is slow, and will type a quick line the way they already do in their Notes app. It also assumes they will notice and fix it when the app misreads the type or date.</p>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup D: Urgency board</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 48px; background: #e9e9e7; color: #222; font: 16px/1.4 system-ui, sans-serif; }
+  .caption, .note, .label { max-width: 1100px; margin: 0 auto; font-size: 14px; color: #444; }
+  .caption { margin-bottom: 14px; }
+  .label { margin-top: 28px; margin-bottom: 10px; }
+  .note { margin-top: 22px; padding-top: 12px; border-top: 1px solid #aaa; }
+  .screen { max-width: 1100px; margin: 0 auto; background: #fff; border: 2px solid #222; border-radius: 8px; overflow: hidden; }
+  header { padding: 18px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px; border-bottom: 1px solid #bbb; }
+  h1 { margin: 0; font-size: 24px; }
+  header p { margin: 0; color: #555; font-size: 14px; }
+  .board { display: grid; grid-template-columns: 1fr 1.25fr 1.25fr; }
+  .col { padding: 16px; border-left: 1px solid #bbb; }
+  .col:first-child { border-left: 0; background: #e2e2df; }
+  h2 { margin: 0 0 12px; font-size: 16px; display: flex; justify-content: space-between; }
+  h2 span { font-weight: 400; color: #555; }
+  .card { display: grid; grid-template-columns: 28px 1fr auto; gap: 2px 10px; align-items: start; background: #fff; border: 1px solid #999; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+  .card.do { border: 2px solid #222; }
+  .box { width: 24px; height: 24px; border: 2px solid #555; border-radius: 5px; background: #fff; padding: 0; }
+  .name { font-weight: 650; }
+  .card small { display: block; font-size: 13px; color: #555; }
+  .rank { width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #222; color: #fff; text-align: center; font-size: 13px; font-weight: 700; }
+  .tag { display: inline-block; margin-top: 5px; margin-right: 4px; padding: 1px 8px; border-radius: 10px; background: #e2dcc0; font-size: 12px; font-weight: 700; }
+  .tag.soon { background: #222; color: #fff; }
+  .plus { width: 100%; font: inherit; font-size: 14px; color: #555; background: none; border: 1px dashed #999; border-radius: 6px; padding: 8px; }
+  .error { border-left: 4px solid #222; background: #f0eee2; padding: 8px 10px; margin-top: 8px; font-size: 14px; font-weight: 650; grid-column: 1 / -1; }
+  .narrow { max-width: 420px; padding: 16px; }
+  .narrow .card { margin: 0; }
+  @media (max-width: 760px) { .board { grid-template-columns: 1fr; } .col { border-left: 0; border-top: 1px solid #bbb; } }
+</style>
+</head>
+<body>
+<p class="caption"><strong>Mockup D: Urgency board.</strong> Flow: open the app → read left to right, most urgent first → check off a card. Items are grouped by time left, not by day. Numbers 1 to 3 mean "do first".</p>
+
+<div class="screen">
+  <header><h1>How much time is left</h1><p>Monday, November 30, 4:10 PM. Busy days: Tue, Wed, Fri</p></header>
+  <div class="board">
+    <section class="col">
+      <h2>Overdue <span>1</span></h2>
+      <div class="card do"><button class="box" aria-label="Mark Stats discussion reply done"></button><div><div class="name">Stats discussion reply</div><small>Assignment, was due Sun 11:59 PM</small></div><span class="rank">1</span></div>
+    </section>
+    <section class="col">
+      <h2>Next 48 hours <span>4</span></h2>
+      <div class="card do"><button class="box" aria-label="Mark Mon coffee shop shift done"></button><div><div class="name">Coffee shop shift</div><small>Work shift, today 5:00 PM, in 50 minutes</small></div><span class="rank">2</span></div>
+      <div class="card do"><button class="box" aria-label="Mark Weekly analytics summary done"></button><div><div class="name">Weekly analytics summary</div><small>Internship, Tue 3:00 PM, in 23 hours</small><span class="tag">Busy day</span></div><span class="rank">3</span></div>
+      <div class="card"><button class="box" aria-label="Mark Econ problem set 7 done"></button><div><div class="name">Econ problem set 7</div><small>Assignment, Tue 11:59 PM, in 32 hours</small><span class="tag soon">Due soon</span><span class="tag">Busy day</span></div></div>
+      <div class="card"><button class="box" aria-label="Mark Wed coffee shop shift done"></button><div><div class="name">Coffee shop shift</div><small>Work shift, Wed 4:00 PM, in 48 hours</small><span class="tag">Busy day</span></div></div>
+      <button class="plus">+ Add</button>
+    </section>
+    <section class="col">
+      <h2>Later this week <span>6</span></h2>
+      <div class="card"><button class="box" aria-label="Mark Marketing case write-up done"></button><div><div class="name">Marketing case write-up</div><small>Assignment, Wed 11:59 PM</small><span class="tag">Busy day</span></div></div>
+      <div class="card"><button class="box" aria-label="Mark Slide edits done"></button><div><div class="name">Slide edits for team check-in</div><small>Internship, Thu 12:00 PM</small></div></div>
+      <div class="card"><button class="box" aria-label="Mark English essay draft done"></button><div><div class="name">English essay draft</div><small>Assignment, Fri 5:00 PM</small><span class="tag">Busy day</span></div></div>
+      <div class="card"><button class="box" aria-label="Mark Fri coffee shop shift done"></button><div><div class="name">Coffee shop shift</div><small>Work shift, Fri 5:00 PM</small><span class="tag">Busy day</span></div></div>
+      <div class="card"><button class="box" aria-label="Mark Sat coffee shop shift done"></button><div><div class="name">Coffee shop shift</div><small>Work shift, Sat 8:00 AM</small></div></div>
+      <div class="card"><button class="box" aria-label="Mark Stats homework 10 done"></button><div><div class="name">Stats homework 10</div><small>Assignment, Sun 11:59 PM</small></div></div>
+      <button class="plus">+ Add</button>
+    </section>
+  </div>
+</div>
+
+<p class="label"><strong>Error state (S1-AC16):</strong> the student checked the first card, the browser couldn't save, and the check was undone.</p>
+<div class="screen narrow">
+  <div class="card do"><button class="box" aria-label="Mark Stats discussion reply done"></button><div><div class="name">Stats discussion reply</div><small>Assignment, was due Sun 11:59 PM</small></div><span class="rank">1</span><div class="error" role="alert">Couldn't save. Try again.</div></div>
+</div>
+
+<p class="note">This assumes the student thinks in "how long do I have?" more than in days of the week, and works on a laptop wide enough to see three columns. It also assumes a "Busy day" tag on each card is enough to notice a collision, even though the two colliding items can land in different columns.</p>
+</body>
+</html>
